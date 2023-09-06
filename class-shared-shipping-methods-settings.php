@@ -97,7 +97,7 @@ class Shared_Shipping_Methods_Settings {
 		// If the shared shipping zone is set to none, delete the option.  If it is set, return.
 		if ( '' === $shared_shipping_zone ) {
 			delete_option( 'shared_shipping_zone' );
-		} elseif ( isset( $shared_shipping_zone ) ) {
+		} elseif ( ! empty( $shared_shipping_zone ) ) {
 			return;
 		}
 
