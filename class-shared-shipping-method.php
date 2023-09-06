@@ -7,10 +7,10 @@
  */
 class Shared_Shipping_Method extends WC_Shipping_Method {
 
-	protected $selected_zone;
-
 	/**
+	 * Sets up this instance of the shared shipping method.
 	 *
+	 * @param int $instance_id The instance ID of this shipping method.
 	 */
 	public function __construct( $instance_id = 0 ) {
 		$this->instance_id        = absint( $instance_id );
