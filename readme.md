@@ -24,3 +24,5 @@ Now you can add these to other shipping zones.  Here's what you'll need to do.
 4.  Select the shared method you want to use from the drop-down.  
 5.  Give your method a title.  This will be visible to customers at checkout and in the cart.
 6.  Save your settings.
+
+There is also a setting in WooCommerce > Settings > Shipping > Shipping Options that can be used to specify the shared shipping methods zone.  The selected zone here will be the source of the available shared shipping methods.
