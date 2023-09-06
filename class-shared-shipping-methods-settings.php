@@ -29,12 +29,13 @@ class Shared_Shipping_Methods_Settings {
 	}
 
 	/**
-	 * Adds a field to select a zone from the shipping options page.
+	 * Adds a field to select a zone from the shipping options page.  It inserts the new field
+	 * into the main shipping settings section.
 	 *
 	 * @param array $settings List of shipping settings.
 	 * @return array The updated list of shipping settings.
 	 */
-	public function insert_settings_page_option_field( $settings ) {
+	public function insert_settings_page_option_field( array $settings ): array {
 
 		$zones        = WC_Shipping_Zones::get_zones();
 		$zone_options = array(
@@ -45,8 +46,8 @@ class Shared_Shipping_Methods_Settings {
 			$zone_options[ $zone['zone_id'] ] = $zone['zone_name'];
 		}
 
-		$settings[] = array(
-			'name'     => __( 'Share shipping zone', 'woocommerce' ),
+		$new_option[] = array(
+			'title'    => __( 'Share shipping zone', 'woocommerce' ),
 			'desc_tip' => __( 'Select a zone to share shipping methods', 'woocommerce' ),
 			'id'       => 'shared_shipping_zone',
 			'type'     => 'select',
@@ -54,6 +55,10 @@ class Shared_Shipping_Methods_Settings {
 			'default'  => '',
 			'options'  => $zone_options,
 		);
+
+		// The settings section is closed by the last item in the $settings array so we need to insert the new option before that.
+		$position = count( $settings ) - 1;
+		array_splice( $settings, $position, 0, $new_option );
 
 		return $settings;
 
@@ -65,7 +70,7 @@ class Shared_Shipping_Methods_Settings {
 	 * @param array $methods List of shipping methods.
 	 * @return array
 	 */
-	public function add_availability( $methods ) {
+	public function add_availability( array $methods ): array {
 		$methods['shared_shipping_method'] = 'Shared_Shipping_Method';
 		return $methods;
 	}
@@ -77,7 +82,7 @@ class Shared_Shipping_Methods_Settings {
 	 * @param array $methods List of shipping methods.
 	 * @return array
 	 */
-	public function selectively_remove_availability( $methods ) {
+	public function selectively_remove_availability( array $methods ): array {
 		if ( isset( $_GET['zone_id'] ) && $_GET['zone_id'] === $this->shared_shipping_zone ) {
 			unset( $methods['shared_shipping_method'] );
 		}
@@ -89,8 +94,11 @@ class Shared_Shipping_Methods_Settings {
 	 * if one isn't set.  The order is set high so it's at the bottom
 	 * of the list. The location is set to Antartica to prevent these
 	 * shipping methods from showing up in the cart.
+	 *
+	 * @throws Exception If the zone fails to save.
+	 * @return void
 	 */
-	public function activate_shared_shipping_methods() {
+	public function activate_shared_shipping_methods(): void {
 
 		$shared_shipping_zone = get_option( 'shared_shipping_zone' );
 

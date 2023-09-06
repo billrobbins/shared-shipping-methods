@@ -28,6 +28,8 @@ class Shared_Shipping_Method extends WC_Shipping_Method {
 
 	/**
 	 * Initializes the settings for this shared shipping method instance.
+	 *
+	 * @return void
 	 */
 	public function init() {
 		$this->init_form_fields();
@@ -42,8 +44,11 @@ class Shared_Shipping_Method extends WC_Shipping_Method {
 	/**
 	 * Initialize form fields for this shipping method.  If the shared shipping zone has been deleted
 	 * we delete the existing option and return.
+	 *
+	 * @throws Exception If the shared shipping zone is invalid.
+	 * @return void
 	 */
-	public function init_form_fields() {
+	public function init_form_fields(): void {
 
 		$shared_shipping_zone = get_option( 'shared_shipping_zone' );
 
@@ -94,8 +99,12 @@ class Shared_Shipping_Method extends WC_Shipping_Method {
 	/**
 	 * WooCommerce calls this method in the cart to determine the costs for a "package."
 	 * We're loading the original shipping method here and using its cost.
+	 *
+	 * @param array $package The package of items to be shipped.
+	 *
+	 * @return void
 	 */
-	public function calculate_shipping( $package = array() ) {
+	public function calculate_shipping( $package = array() ): void {
 
 		$selected_shared_method = $this->get_option( 'selected_shared_method' );
 
