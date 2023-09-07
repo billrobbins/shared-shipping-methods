@@ -140,12 +140,11 @@ class Shared_Shipping_Method extends WC_Shipping_Method {
 
 			if ( $shipping_method->id === $shipping_method_id ) {
 				$class_name = get_class( $shipping_method );
-				$instance   = new $class_name( $method_instance_id );
 				break;
 			}
 		}
 
-		if ( ! isset( $instance ) ) {
+		if ( ! isset( $class_name ) ) {
 			$logger = wc_get_logger();
 			$logger->log(
 				'error',
@@ -157,6 +156,7 @@ class Shared_Shipping_Method extends WC_Shipping_Method {
 			return;
 		}
 
+		$instance = new $class_name( $method_instance_id );
 		$instance->calculate_shipping( $package );
 
 		$shipping_rates = $instance->get_rates_for_package( $package );
