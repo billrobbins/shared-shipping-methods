@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name:       Shared Shipping Methods
- * Plugin URI:        https://example.com/plugins/the-basics/
- * Description:       Share shipping methods with other zones.
+ * Plugin URI:        https://github.com/billrobbins/shared-shipping-methods
+ * Description:       Share shipping methods from one zone with the others.
  * Version:           1.0.0
  * Requires at least: 6.0
  * Requires PHP:      7.4
