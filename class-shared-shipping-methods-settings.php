@@ -103,7 +103,7 @@ class Shared_Shipping_Methods_Settings {
 		$shared_shipping_zone = get_option( 'shared_shipping_zone' );
 
 		// If the shared shipping zone is set we don't need to create a new zone.
-		if ( ! empty( $shared_shipping_zone ) ) {
+		if ( ! isset( $shared_shipping_zone ) ) {
 			return;
 		}
 
