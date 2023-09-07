@@ -42,8 +42,8 @@ class Shared_Shipping_Method extends WC_Shipping_Method {
 	}
 
 	/**
-	 * Initialize form fields for this shipping method.  If the shared shipping zone has been deleted
-	 * we delete the existing option and return.
+	 * Initialize form fields for this shipping method.  If the set shared shipping
+	 * zone is invalid, we delete the option.
 	 *
 	 * @throws Exception If the shared shipping zone is invalid.
 	 * @return void
@@ -60,6 +60,14 @@ class Shared_Shipping_Method extends WC_Shipping_Method {
 			$selected_zone = new WC_Shipping_Zone( $shared_shipping_zone );
 		} catch ( Exception $e ) {
 			delete_option( 'shared_shipping_zone' );
+			$logger = wc_get_logger();
+			$logger->log(
+				'error',
+				'Invalid shared shipping zone.  Shared shipping zone ' . $shared_shipping_zone . ' deleted.',
+				array(
+					'source' => 'Shared Shipping Methods',
+				)
+			);
 			return;
 		}
 

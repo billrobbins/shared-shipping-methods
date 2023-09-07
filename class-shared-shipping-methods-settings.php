@@ -102,10 +102,8 @@ class Shared_Shipping_Methods_Settings {
 
 		$shared_shipping_zone = get_option( 'shared_shipping_zone' );
 
-		// If the shared shipping zone is set to none, delete the option.  If it is set, return.
-		if ( '' === $shared_shipping_zone ) {
-			delete_option( 'shared_shipping_zone' );
-		} elseif ( ! empty( $shared_shipping_zone ) ) {
+		// If the shared shipping zone is set we don't need to create a new zone.
+		if ( ! empty( $shared_shipping_zone ) ) {
 			return;
 		}
 
@@ -122,7 +120,13 @@ class Shared_Shipping_Methods_Settings {
 
 		} catch ( Exception $e ) {
 			$logger = wc_get_logger();
-			$logger->log( 'error', 'Failed to save shared_shipping_zone option for zone id: ' . $zone_id, array( 'source' => 'Shared Shipping Methods' ) );
+			$logger->log(
+				'error',
+				'Failed to save shared_shipping_zone option for zone id: ' . $zone_id,
+				array(
+					'source' => 'Shared Shipping Methods',
+				)
+			);
 		}
 
 	}
