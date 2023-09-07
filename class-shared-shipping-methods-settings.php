@@ -90,10 +90,14 @@ class Shared_Shipping_Methods_Settings {
 	}
 
 	/**
-	 * Adds a new shared shipping zone when the plugin is activated
-	 * if one isn't set.  The order is set to 100 so it's at the bottom
-	 * of the list. The location is set to Antartica to prevent these
-	 * shipping methods from showing up in the cart.
+	 * Handles the activation of the plugin.
+	 *
+	 * When the plugin is activated, it checks to see if the shared_shipping_zone
+	 * option is set.  If it isn't, a new zone is created and the ID is saved to
+	 * the option.
+	 * The order is set to 100 so it's at the bottom of the list.
+	 * The location is set to Antartica to prevent these shipping methods from being
+	 * directly offered to customers in the cart.
 	 *
 	 * @throws Exception If the zone fails to save.
 	 * @return void

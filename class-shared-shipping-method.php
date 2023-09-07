@@ -15,7 +15,7 @@ class Shared_Shipping_Method extends WC_Shipping_Method {
 	public function __construct( $instance_id = 0 ) {
 		$this->instance_id        = absint( $instance_id );
 		$this->id                 = 'shared_shipping_method';
-		$this->method_title       = __( 'Shared Shipping Methods', 'woocommerce' );
+		$this->method_title       = __( 'Shared Shipping Method', 'woocommerce' );
 		$this->method_description = __( 'Use an existing shipping method from another zone.', 'woocommerce' );
 		$this->title              = 'Shared Shipping Method';
 		$this->supports           = array(
@@ -53,6 +53,18 @@ class Shared_Shipping_Method extends WC_Shipping_Method {
 		$shared_shipping_zone = get_option( 'shared_shipping_zone' );
 
 		if ( ! $shared_shipping_zone ) {
+			$this->instance_form_fields = array(
+				'title' => array(
+					'title'       => __( 'Shared Shipping Zone not Set', 'woocommerce' ),
+					'type'        => 'title',
+					'description' => sprintf(
+						/* translators: %s: URL to the Shipping Options page. */
+						__( 'Please select a shared shipping method zone on the <a href="%s">Shipping Options</a> page.', 'woocommerce' ),
+						admin_url( 'admin.php?page=wc-settings&tab=shipping&section=options' )
+					),
+					'desc_tip'    => false,
+				),
+			);
 			return;
 		}
 
