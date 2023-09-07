@@ -15,8 +15,8 @@ class Shared_Shipping_Method extends WC_Shipping_Method {
 	public function __construct( $instance_id = 0 ) {
 		$this->instance_id        = absint( $instance_id );
 		$this->id                 = 'shared_shipping_method';
-		$this->method_title       = __( 'Shared Shipping Method', 'woocommerce' );
-		$this->method_description = __( 'Use an existing shipping method from another zone.', 'woocommerce' );
+		$this->method_title       = __( 'Shared Shipping Method', 'shared-shipping-methods' );
+		$this->method_description = __( 'Use an existing shipping method from another zone.', 'shared-shipping-methods' );
 		$this->title              = 'Shared Shipping Method';
 		$this->supports           = array(
 			'shipping-zones',
@@ -55,11 +55,11 @@ class Shared_Shipping_Method extends WC_Shipping_Method {
 		if ( ! $shared_shipping_zone ) {
 			$this->instance_form_fields = array(
 				'title' => array(
-					'title'       => __( 'Shared Shipping Zone not Set', 'woocommerce' ),
+					'title'       => __( 'Shared Shipping Zone not Set', 'shared-shipping-methods' ),
 					'type'        => 'title',
 					'description' => sprintf(
 						/* translators: %s: URL to the Shipping Options page. */
-						__( 'Please select a shared shipping method zone on the <a href="%s">Shipping Options</a> page.', 'woocommerce' ),
+						__( 'Please select a shared shipping method zone on the <a href="%s">Shipping Options</a> page.', 'shared-shipping-methods' ),
 						admin_url( 'admin.php?page=wc-settings&tab=shipping&section=options' )
 					),
 					'desc_tip'    => false,
@@ -92,14 +92,14 @@ class Shared_Shipping_Method extends WC_Shipping_Method {
 
 		$this->instance_form_fields = array(
 			'title'                  => array(
-				'title'       => __( 'Title', 'woocommerce' ),
+				'title'       => __( 'Title', 'shared-shipping-methods' ),
 				'type'        => 'text',
-				'description' => __( 'This controls the title which the user sees during checkout.', 'woocommerce' ),
+				'description' => __( 'This controls the title which the user sees during checkout.', 'shared-shipping-methods' ),
 				'default'     => $this->method_title,
 				'desc_tip'    => true,
 			),
 			'selected_shared_method' => array(
-				'title'   => __( 'Select other method', 'woocommerce' ),
+				'title'   => __( 'Select other method', 'shared-shipping-methods' ),
 				'type'    => 'select',
 				'class'   => 'wc-enhanced-select',
 				'default' => '',

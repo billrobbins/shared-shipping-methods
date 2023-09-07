@@ -47,8 +47,8 @@ class Shared_Shipping_Methods_Settings {
 		}
 
 		$new_option[] = array(
-			'title'    => __( 'Share shipping zone', 'woocommerce' ),
-			'desc_tip' => __( 'Select a zone to share shipping methods', 'woocommerce' ),
+			'title'    => __( 'Share shipping methods zone', 'shared-shipping-methods' ),
+			'desc_tip' => __( 'Select a source zone for sharing shipping methods.', 'shared-shipping-methods' ),
 			'id'       => 'shared_shipping_zone',
 			'type'     => 'select',
 			'class'    => 'wc-enhanced-select',
