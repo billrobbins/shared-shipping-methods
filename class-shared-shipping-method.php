@@ -117,7 +117,9 @@ class Shared_Shipping_Method extends WC_Shipping_Method {
 	}
 
 	/**
-	 * WooCommerce calls this method in the cart to determine the costs for a "package."
+	 * Determines the cost for shipping this package.
+	 *
+	 * WooCommerce calls this method in the cart to calculate the costs for a "package."
 	 * We're loading the original shipping method here and using its cost.
 	 *
 	 * @param array $package The package of items to be shipped.
@@ -144,16 +146,31 @@ class Shared_Shipping_Method extends WC_Shipping_Method {
 		}
 
 		if ( ! isset( $instance ) ) {
+			$logger = wc_get_logger();
+			$logger->log(
+				'error',
+				'Failed to load shipping method id: ' . $shipping_method_id . ' instance: ' . $method_instance_id . '.',
+				array(
+					'source' => 'Shared Shipping Methods',
+				)
+			);
 			return;
 		}
 
-		$rate = array(
-			'id'      => $this->get_rate_id(),
-			'label'   => $this->title,
-			'cost'    => $instance->cost,
-			'package' => $package,
-		);
+		$instance->calculate_shipping( $package );
 
-		$this->add_rate( $rate );
+		$shipping_rates = $instance->get_rates_for_package( $package );
+
+		foreach ( $shipping_rates as $shipping_rate ) {
+			$rate = array(
+				'id'      => $this->get_rate_id(),
+				'label'   => $this->title,
+				'cost'    => $shipping_rate->get_cost(),
+				'package' => $package,
+			);
+
+			$this->add_rate( $rate );
+		}
+
 	}
 }
