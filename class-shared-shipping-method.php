@@ -163,8 +163,8 @@ class Shared_Shipping_Method extends WC_Shipping_Method {
 
 		foreach ( $shipping_rates as $shipping_rate ) {
 			$rate = array(
-				'id'      => $this->get_rate_id(),
-				'label'   => $this->title,
+				'id'      => $shipping_rate->get_id(),
+				'label'   => $shipping_rate->get_label(),
 				'cost'    => $shipping_rate->get_cost(),
 				'package' => $package,
 			);
