@@ -10,7 +10,7 @@
  * Author URI:        https://justabill.blog
  * License:           GPL v2 or later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain:       shared-shipping-methods
+ * Text Domain:       shared-shipping-methods -- to be updated
  * Domain Path:       /languages
  */
 

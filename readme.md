@@ -14,7 +14,7 @@ Once activated, the plugin creates a new shipping zone named "Shared Shipping Me
 
 Get started by adding the shipping methods you'd like to share.  Here's how.
 
-1.  Navigate to WooCommerce > Settings > Shipping and select the "Shared Shipping Methods" zone.  
+1. Navigate to `WooCommerce > Settings > Shipping` and select the "Shared Shipping Methods" zone.  
 2. Add a new shipping method, ensuring you've filled all necessary settings.
 3. Repeat these steps to share additional shipping methods.
 
@@ -28,3 +28,7 @@ Get started by adding the shipping methods you'd like to share.  Here's how.
 6. Save your settings.
 
 To specify the shared shipping methods zone, go to `WooCommerce > Settings > Shipping > Shipping Options`. The selected zone in this setting will be considered as the source of available shared shipping methods.
+
+## Contributing
+
+If you spot any issues or have feature requests, please open up an issue or feel free to submit a pull request.

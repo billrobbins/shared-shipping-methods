@@ -15,9 +15,9 @@ class Shared_Shipping_Method extends WC_Shipping_Method {
 	public function __construct( $instance_id = 0 ) {
 		$this->instance_id        = absint( $instance_id );
 		$this->id                 = 'shared_shipping_method';
-		$this->method_title       = __( 'Shared Shipping Methods', 'woocommerce' );
-		$this->method_description = __( 'Use an existing shipping method from another zone.', 'woocommerce' );
-		$this->title              = 'Shared Shipping Method';
+		$this->method_title       = __( 'Shared Shipping Method', 'shared-shipping-methods' );
+		$this->method_description = __( 'Use an existing shipping method from another zone.', 'shared-shipping-methods' );
+		$this->title              = __( 'Shared Shipping Method', 'shared-shipping-methods' );
 		$this->supports           = array(
 			'shipping-zones',
 			'instance-settings',
@@ -42,8 +42,8 @@ class Shared_Shipping_Method extends WC_Shipping_Method {
 	}
 
 	/**
-	 * Initialize form fields for this shipping method.  If the shared shipping zone has been deleted
-	 * we delete the existing option and return.
+	 * Initialize form fields for this shipping method.  If the set shared shipping
+	 * zone is invalid, we delete the option.
 	 *
 	 * @throws Exception If the shared shipping zone is invalid.
 	 * @return void
@@ -53,6 +53,18 @@ class Shared_Shipping_Method extends WC_Shipping_Method {
 		$shared_shipping_zone = get_option( 'shared_shipping_zone' );
 
 		if ( ! $shared_shipping_zone ) {
+			$this->instance_form_fields = array(
+				'title' => array(
+					'title'       => __( 'Shared Shipping Zone not Set', 'shared-shipping-methods' ),
+					'type'        => 'title',
+					'description' => sprintf(
+						/* translators: %s: URL to the Shipping Options page. */
+						__( 'Please select a shared shipping method zone on the <a href="%s">Shipping Options</a> page.', 'shared-shipping-methods' ),
+						admin_url( 'admin.php?page=wc-settings&tab=shipping&section=options' )
+					),
+					'desc_tip'    => false,
+				),
+			);
 			return;
 		}
 
@@ -60,6 +72,14 @@ class Shared_Shipping_Method extends WC_Shipping_Method {
 			$selected_zone = new WC_Shipping_Zone( $shared_shipping_zone );
 		} catch ( Exception $e ) {
 			delete_option( 'shared_shipping_zone' );
+			$logger = wc_get_logger();
+			$logger->log(
+				'error',
+				'Invalid shared shipping zone.  Shared shipping zone ' . $shared_shipping_zone . ' deleted.',
+				array(
+					'source' => 'Shared Shipping Methods',
+				)
+			);
 			return;
 		}
 
@@ -72,14 +92,14 @@ class Shared_Shipping_Method extends WC_Shipping_Method {
 
 		$this->instance_form_fields = array(
 			'title'                  => array(
-				'title'       => __( 'Title', 'woocommerce' ),
+				'title'       => __( 'Title', 'shared-shipping-methods' ),
 				'type'        => 'text',
-				'description' => __( 'This controls the title which the user sees during checkout.', 'woocommerce' ),
+				'description' => __( 'This controls the title which the user sees during checkout.', 'shared-shipping-methods' ),
 				'default'     => $this->method_title,
 				'desc_tip'    => true,
 			),
 			'selected_shared_method' => array(
-				'title'   => __( 'Select other method', 'woocommerce' ),
+				'title'   => __( 'Select other method', 'shared-shipping-methods' ),
 				'type'    => 'select',
 				'class'   => 'wc-enhanced-select',
 				'default' => '',
@@ -97,7 +117,9 @@ class Shared_Shipping_Method extends WC_Shipping_Method {
 	}
 
 	/**
-	 * WooCommerce calls this method in the cart to determine the costs for a "package."
+	 * Determines the cost for shipping this package.
+	 *
+	 * WooCommerce calls this method in the cart to calculate the costs for a "package."
 	 * We're loading the original shipping method here and using its cost.
 	 *
 	 * @param array $package The package of items to be shipped.
@@ -118,22 +140,37 @@ class Shared_Shipping_Method extends WC_Shipping_Method {
 
 			if ( $shipping_method->id === $shipping_method_id ) {
 				$class_name = get_class( $shipping_method );
-				$instance   = new $class_name( $method_instance_id );
 				break;
 			}
 		}
 
-		if ( ! isset( $instance ) ) {
+		if ( ! isset( $class_name ) ) {
+			$logger = wc_get_logger();
+			$logger->log(
+				'error',
+				'Failed to load shipping method id: ' . $shipping_method_id . ' instance: ' . $method_instance_id . '.',
+				array(
+					'source' => 'Shared Shipping Methods',
+				)
+			);
 			return;
 		}
 
-		$rate = array(
-			'id'      => $this->get_rate_id(),
-			'label'   => $this->title,
-			'cost'    => $instance->cost,
-			'package' => $package,
-		);
+		$instance = new $class_name( $method_instance_id );
+		$instance->calculate_shipping( $package );
 
-		$this->add_rate( $rate );
+		$shipping_rates = $instance->get_rates_for_package( $package );
+
+		foreach ( $shipping_rates as $shipping_rate ) {
+			$rate = array(
+				'id'      => $shipping_rate->get_id(),
+				'label'   => $shipping_rate->get_label(),
+				'cost'    => $shipping_rate->get_cost(),
+				'package' => $package,
+			);
+
+			$this->add_rate( $rate );
+		}
+
 	}
 }
