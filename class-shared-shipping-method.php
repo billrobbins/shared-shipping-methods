@@ -17,7 +17,7 @@ class Shared_Shipping_Method extends WC_Shipping_Method {
 		$this->id                 = 'shared_shipping_method';
 		$this->method_title       = __( 'Shared Shipping Method', 'shared-shipping-methods' );
 		$this->method_description = __( 'Use an existing shipping method from another zone.', 'shared-shipping-methods' );
-		$this->title              = 'Shared Shipping Method';
+		$this->title              = __( 'Shared Shipping Method', 'shared-shipping-methods' );
 		$this->supports           = array(
 			'shipping-zones',
 			'instance-settings',

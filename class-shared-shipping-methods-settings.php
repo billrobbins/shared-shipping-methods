@@ -13,12 +13,33 @@ class Shared_Shipping_Methods_Settings {
 	protected $shared_shipping_zone;
 
 	/**
+	 * ID for the shared shipping method.
+	 *
+	 * @var string
+	 */
+	protected $shared_shipping_method_id = 'shared_shipping_method';
+
+	/**
+	 * Class ID for the shared shipping method.
+	 *
+	 * @var string
+	 */
+	protected $shared_shipping_method_class_id = 'Shared_Shipping_Method';
+
+	/**
+	 * Shared Shipping Methods option
+	 *
+	 * @var string
+	 */
+	protected $shared_shipping_zone_option = 'shared_shipping_zone';
+
+	/**
 	 * The class sets up the shared shipping option and adds the shared shipping method
 	 * to the list of shipping methods.  It also hooks our activation method.
 	 */
 	public function __construct() {
 
-		$this->shared_shipping_zone = get_option( 'shared_shipping_zone' );
+		$this->shared_shipping_zone = get_option( $this->shared_shipping_zone_option );
 
 		add_filter( 'woocommerce_shipping_settings', array( $this, 'insert_settings_page_option_field' ) );
 		add_filter( 'woocommerce_shipping_methods', array( $this, 'add_availability' ) );
@@ -29,27 +50,32 @@ class Shared_Shipping_Methods_Settings {
 	}
 
 	/**
-	 * Adds a field to select a zone from the shipping options page.  It inserts the new field
-	 * into the main shipping settings section.
+	 * Add a new field to the shipping options page.
+	 *
+	 * This field allows the user to select a zone to share shipping methods from.  It excludes
+	 * zones where a shared shipping method is already present to prevent a loop.
 	 *
 	 * @param array $settings List of shipping settings.
 	 * @return array The updated list of shipping settings.
 	 */
 	public function insert_settings_page_option_field( array $settings ): array {
 
-		$zones        = WC_Shipping_Zones::get_zones();
-		$zone_options = array(
+		$shipping_zones = WC_Shipping_Zones::get_zones();
+		$zone_options   = array(
 			'' => 'None',
 		);
 
-		foreach ( $zones as $zone ) {
-			$zone_options[ $zone['zone_id'] ] = $zone['zone_name'];
+		foreach ( $shipping_zones as $shipping_zone ) {
+			$zone = WC_Shipping_Zones::get_zone_by( 'zone_id', $shipping_zone['id'] );
+			if ( ! $this->check_shipping_method_in_zone( $zone, $this->shared_shipping_method_id ) ) {
+				$zone_options[ $shipping_zone['zone_id'] ] = $shipping_zone['zone_name'];
+			}
 		}
 
 		$new_option[] = array(
 			'title'    => __( 'Share shipping methods zone', 'shared-shipping-methods' ),
 			'desc_tip' => __( 'Select a source zone for sharing shipping methods.', 'shared-shipping-methods' ),
-			'id'       => 'shared_shipping_zone',
+			'id'       => $this->shared_shipping_zone_option,
 			'type'     => 'select',
 			'class'    => 'wc-enhanced-select',
 			'default'  => '',
@@ -65,13 +91,34 @@ class Shared_Shipping_Methods_Settings {
 	}
 
 	/**
+	 * Checks to see if a shipping method is in a zone.
+	 *
+	 * @param WC_Shipping_Zone $zone               The zone to check.
+	 * @param string           $shipping_method_id The ID of the shipping method to check.
+	 *
+	 * @return bool
+	 */
+	private function check_shipping_method_in_zone( WC_Shipping_Zone $zone, string $shipping_method_id ): bool {
+
+		$shipping_methods = $zone->get_shipping_methods();
+
+		foreach ( $shipping_methods as $method ) {
+			if ( $method->id === $shipping_method_id ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Adds the Shared Shipping Methods class to the list of shipping methods.
 	 *
 	 * @param array $methods List of shipping methods.
 	 * @return array
 	 */
 	public function add_availability( array $methods ): array {
-		$methods['shared_shipping_method'] = 'Shared_Shipping_Method';
+		$methods[ $this->shared_shipping_method_id ] = $this->shared_shipping_method_class_id;
 		return $methods;
 	}
 
@@ -84,7 +131,7 @@ class Shared_Shipping_Methods_Settings {
 	 */
 	public function selectively_remove_availability( array $methods ): array {
 		if ( isset( $_GET['zone_id'] ) && $_GET['zone_id'] === $this->shared_shipping_zone ) {
-			unset( $methods['shared_shipping_method'] );
+			unset( $methods[ $this->shared_shipping_method_id ] );
 		}
 		return $methods;
 	}
@@ -104,7 +151,7 @@ class Shared_Shipping_Methods_Settings {
 	 */
 	public function activate_shared_shipping_methods(): void {
 
-		$shared_shipping_zone = get_option( 'shared_shipping_zone' );
+		$shared_shipping_zone = get_option( $this->shared_shipping_zone_option );
 
 		// If the shared shipping zone is set we don't need to create a new zone.
 		if ( isset( $shared_shipping_zone ) ) {
@@ -120,7 +167,7 @@ class Shared_Shipping_Methods_Settings {
 			$zone->save();
 
 			$zone_id = $zone->get_id();
-			add_option( 'shared_shipping_zone', $zone_id, '', 'no' );
+			add_option( $this->shared_shipping_zone_option, $zone_id, '', 'no' );
 
 		} catch ( Exception $e ) {
 			$logger = wc_get_logger();
